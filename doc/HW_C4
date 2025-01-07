@@ -1,0 +1,59 @@
+@startuml
+' описание синтаксиса
+' https://github.com/plantuml-stdlib/C4-PlantUML
+' библиотеки C4
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+' иконочки для сервисов
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/database.puml
+
+
+AddElementTag("ВРаботе", $bgColor="#FFD700")
+AddElementTag("Готово", $bgColor="#008000")
+AddElementTag("НеПриступали", $bgColor="#F08080")
+
+' раскомментировать, если файлы расположили локально (путь к файлам)
+' !include C4_Container.puml
+
+' текст без переноса
+' skinparam wrapWidth 300 
+' линии без скруглений
+skinparam Linetype ortho
+' skinparam Linetype polyline
+' LAYOUT_LANDSCAPE()
+' LAYOUT_TOP_DOWN()
+' LAYOUT_AS_SKETCH()
+' LAYOUT_WITH_LEGEND()
+
+title
+ <b>Торговая компания с множеством складов</b>
+end title 
+
+'наша большая система над которой мы работаем
+System_Boundary(БазаТорговля, "Конфигурация Торговля",) {
+    Container(Продажи, "Продажи", "Заказ клиента, продажи","",$tags="Готово")
+}
+
+' вторая система
+System_Boundary(БазаСклад, "Конфигурация Склад",) {
+    Container(Склад, "Склад", "Заказ на сборку","",$tags="Готово")    
+}
+
+' В виде компонент
+Component(RMQ,"RMQ","Брокер сообщений", $sprite="database",)
+
+
+' Внешние связи
+BiRel_D(БазаТорговля, RMQ,"")
+BiRel_D(БазаСклад, RMQ,"")
+BiRel_R(Продажи, Склад,"Заказ клиента, Статусы")
+
+
+' Расположение систем 
+Lay_R(БазаСклад,RMQ)
+Lay_L(БазаТорговля,RMQ)
+
+@enduml
